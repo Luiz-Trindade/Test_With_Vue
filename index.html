@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuários com Vue.js</title>
+    
+    <!-- importação do css -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- importação do bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- importação do vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- <script src="main.vue"></script> -->
+
+    <!-- importação do axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    
+    <!-- container principal -->
+    <div id="app" class="container space">
+        
+        <!-- primeira linha -->
+        <div class="row">
+
+            <h1>Cadatro de Usuários</h1>
+            <h4>Created By: Luiz Trindade</h4>
+            <h4>Last Update: 24/02/2024 at 20:22</h4>
+
+            <!-- primeira coluna da primeira linha -->
+            <div class="col">
+                <!-- área de entrada de dados -->
+                <input id="nome-entry" type="text" class="form-control" placeholder="Nome ✍️" v-model="nome" required>
+                <input id="telefone-entry" type="tel" class="form-control" placeholder="Telefone ☎️" v-model="telefone" required>
+                <input id="email-entry" type="email" class="form-control" placeholder="Email 📧" v-model="email" required>
+            </div>
+
+        </div>
+
+        <!-- segunda linha -->
+        <div class="row">
+            <!-- implementação do botão "cadastrar" -->
+            <button type="button" class="btn btn-success" @click="Insert_In_Database()">Cadastrar ✅</button>
+        </div>
+
+        <h4>Registros: {{registros}}</h4>
+
+        <!-- terceira linha -->
+        <div class="row">
+
+            <!-- primeira coluna da segunda linha -->
+            <div class="col">
+
+                <!-- tabela -->
+                <table class="table">
+
+                    <!-- cabeçalho da tabela -->
+                    <thead>
+                      <tr>
+                        <th>ID 🔑</th>
+                        <th>Nome ✍️</th>
+                        <th>Telefone ☎️</th>
+                        <th>Email 📧</th>
+                        <th>Opções ⚙️</th>
+                      </tr>
+                    </thead>
+
+                    <!-- corpo da tabela -->
+                    <tbody>
+                      <tr v-for="item in lista_de_contatos" v-bind:key="item.id">
+                        <td> {{ item.id }} </td>
+                        <td> {{ item.nome }} </td>
+                        <td> {{ item.telefone }} </td>
+                        <td> {{ item.email }} </td>
+                        <td> <button type="button" class="btn btn-danger" @click="Delete_From_Database(item.id)">Deletar 🗑️</button> </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+<!-- início do programa em Vue.js -->
+<script>
+    // início da aplicação Vue.js
+    var app = new Vue({
+        el: "#app",
+
+        // definição de variáveis
+        data: {
+            nome: "",
+            telefone: "",
+            email: "",
+            lista_de_contatos: [],
+            registros: 0
+        },
+
+        created(){
+            this.View_From_Database();
+        },
+
+        // definição de métodos
+        methods:{
+
+            Insert_In_Database(){
+                var dados = {
+                    "nome": this.nome,
+                    "telefone": this.telefone,
+                    "email": this.email,
+                }
+
+                axios.post("php/insert.php", dados, {
+                    headers:{
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(function (response){
+                        console.log(response.data);
+                    })
+                    .catch(function (error){
+                        console.error(error);
+                    })
+
+                //location.reload();
+                this.View_From_Database();
+            },
+
+            Delete_From_Database(index){
+                var dados = {
+                    "id": index
+                }
+                axios.post("php/delete.php", dados, {
+                    headers:{
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(function (response){
+                    console.log(response.data);
+                }).catch(function (error){
+                    console.error(error);
+                })
+
+                //location.reload();
+                this.View_From_Database();
+            },
+
+            View_From_Database(){
+                axios.get("php/view.php")
+                    .then(response => {
+                        console.log(response.data);
+
+                        this.lista_de_contatos = response.data;
+                        this.registros = this.lista_de_contatos.length;
+                        
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+
+            }    
+
+        }
+    })
+
+</script>
+
+</html>

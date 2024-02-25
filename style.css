@@ -1,0 +1,21 @@
+body{
+    padding: 2%;
+    margin: 2%;
+}
+
+input, table, h1, button{
+    text-align: center;
+    text-shadow: 1.5px 1.5px 1.5px purple;
+    font-size: 20px;
+}
+
+h4{
+    text-align: center;
+    text-shadow: 1.5px 1.5px 1.5px purple;
+}
+
+.space{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
